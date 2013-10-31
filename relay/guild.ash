@@ -1,3 +1,6 @@
+script "Improved Guild Trainer";
+notify rlbond86;
+
 
 boolean debug = false;
 void debugPrint(string s)
