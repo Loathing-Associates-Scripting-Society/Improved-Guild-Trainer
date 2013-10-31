@@ -8,7 +8,8 @@ void debugPrint(string s)
 
 record SkillInfo
 {
-    string cost;
+    int mpCost;
+    int numTurns;
     string type;
     string effectText;
 };
@@ -36,8 +37,17 @@ SkillInfo getSkillInfo(int number)
     {
         debugPrint("Matched skill to an effect");
         s.type = group(effectMatcher, 1);
-        s.cost = group(effectMatcher, 2);
+        string mp = group(effectMatcher, 2);
+        if (mp == "N/A")
+            s.mpCost = -1;
+        else
+            s.mpCost = to_int(mp);
         s.effectText = getEffect(group(effectMatcher, 3));
+        matcher m = create_matcher("\\((\\d+) Adventures\\)", txt);
+        if (find(m))
+            s.numTurns = to_int(m.group(1));
+        else
+            s.numTurns = -1;
         return s;
     }
     matcher blueTextMatcher = create_matcher("(?s)<b>Type:</b>\\s*([^<]+)<.*MP Cost:</b>\\s*(\\d+|N/A).*<font color=blue[^>]*><b>(.*?)</b></font></center>", txt);
@@ -45,8 +55,13 @@ SkillInfo getSkillInfo(int number)
     {
         debugPrint("Found blue text.");
         s.type = group(blueTextMatcher, 1);
-        s.cost = group(blueTextMatcher, 2);
+        string mp = group(blueTextMatcher, 2);
+        if (mp == "N/A")
+            s.mpCost = -1;
+        else
+            s.mpCost = to_int(mp);
         s.effectText = group(blueTextMatcher, 3);
+        s.numTurns = -1;
         return s;
     }
     matcher simpleMatcher = create_matcher("(?s)<b>Type:</b>\s*([^<]+)<.*MP Cost:</b>\s*(\d+|N/A).*<blockquote class=small>([^<]+)<", txt);
@@ -54,13 +69,19 @@ SkillInfo getSkillInfo(int number)
     {
         debugPrint("Found simple match");
         s.type = group(simpleMatcher, 1);
-        s.cost = group(simpleMatcher, 2);
+        string mp = group(simpleMatcher, 2);
+        if (mp == "N/A")
+            s.mpCost = -1;
+        else
+            s.mpCost = to_int(mp);
         s.effectText = group(simpleMatcher, 3);
+        s.numTurns = -1;
         return s;
     }
     debugPrint("Failed to match.");
     s.type = "?";
-    s.cost = "?";
+    s.mpCost = -1;
+    s.numTurns = -1;
     s.effectText = "?";
     return s;
 }
@@ -73,7 +94,17 @@ string getSkillText(int number)
         return skillMap[number];
 
     SkillInfo s = getSkillInfo(number);
-    string st = s.type + " (" + s.cost + "): " + s.effectText;
+    string st = s.type;
+    if (s.mpCost != -1)
+    {
+        if (s.numTurns != -1)
+            st += " (" + s.mpCost + " MP / " + s.numTurns + " adv.): ";
+        else
+            st += " (" + s.mpCost + " MP): ";
+    }
+    else
+        st += ": ";
+    st +=  s.effectText;
     st = replace_string(st, "<br>", ", ");
     if (char_at(st, length(st)-2) == ",")
         st = substring(st, 0, length(st)-2);
