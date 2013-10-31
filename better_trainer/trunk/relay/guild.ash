@@ -2,7 +2,7 @@ script "Improved Guild Trainer";
 notify rlbond86;
 
 
-boolean debug = false;
+boolean debug = true;
 void debugPrint(string s)
 {
     if (debug)
@@ -67,7 +67,7 @@ SkillInfo getSkillInfo(int number)
         s.numTurns = -1;
         return s;
     }
-    matcher simpleMatcher = create_matcher("(?s)<b>Type:</b>\s*([^<]+)<.*MP Cost:</b>\s*(\d+|N/A).*<blockquote class=small>([^<]+)<", txt);
+    matcher simpleMatcher = create_matcher("(?s)<b>Type:</b>\\s*([^<]+)<.*MP Cost:</b>\\s*(\\d+|N/A).*<blockquote class=small>([^<]+)<", txt);
     if (find(simpleMatcher))
     {
         debugPrint("Found simple match");
@@ -78,7 +78,7 @@ SkillInfo getSkillInfo(int number)
         else
             s.mpCost = to_int(mp);
         s.effectText = group(simpleMatcher, 3);
-        s.numTurns = -1;
+        s.numTurns = -2;
         return s;
     }
     debugPrint("Failed to match.");
@@ -98,9 +98,9 @@ string getSkillText(int number)
 
     SkillInfo s = getSkillInfo(number);
     string st = s.type;
-    if (s.mpCost != -1)
+    if (s.mpCost >= 0)
     {
-        if (s.numTurns != -1)
+        if (s.numTurns >= 0)
             st += " (" + s.mpCost + " MP / " + s.numTurns + " adv.): ";
         else
             st += " (" + s.mpCost + " MP): ";
@@ -111,6 +111,8 @@ string getSkillText(int number)
     st = replace_string(st, "<br>", ", ");
     if (char_at(st, length(st)-2) == ",")
         st = substring(st, 0, length(st)-2);
+    if (s.numTurns == -2)
+        st = "<font size=1><span style=\"max-width:300px; width:300px;\">" + st + "</span></font>";
     skillMap[number] = st;
     return st;
 }
