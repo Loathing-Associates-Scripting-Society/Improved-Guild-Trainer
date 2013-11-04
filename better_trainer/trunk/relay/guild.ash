@@ -121,7 +121,8 @@ string getSkillText(int number)
 void main()
 {
     if (form_field("place") != "trainer")
-        return;
+        if (form_field("action") != "buyskill")
+            return;
 
     string txt = visit_url();
     buffer out;
