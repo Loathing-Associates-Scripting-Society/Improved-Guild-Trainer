@@ -18,13 +18,24 @@ record SkillInfo
 };
 
 
-string getEffect(string url)
+boolean isVariableEffect(string it)
+{
+	string s = string_modifier(it, "Modifiers"); // get list of modifiers
+	matcher m = create_matcher("([^, :][^,:]*): \\[([^\\]]*)\\]", s); // find variable modifier
+    return find(m);
+}
+
+
+string getEffect(string url, string name)
 {
     string txt = visit_url(url);
     matcher m = create_matcher("<font color=blue[^>]*><b>(.*?)</b></font></center>", txt);
     if (find(m))
     {
-        return group(m,1);
+        string s = group(m,1);
+        if (isVariableEffect(name))
+            s += " <i>(Variable)</i>";
+        return s;
     }
     return "";
 }
@@ -45,7 +56,7 @@ SkillInfo getSkillInfo(int number)
             s.mpCost = -1;
         else
             s.mpCost = to_int(mp);
-        s.effectText = getEffect(group(effectMatcher, 3));
+        s.effectText = getEffect(group(effectMatcher, 3), group(effectMatcher, 4));
         matcher m = create_matcher("\\((\\d+) Adventures\\)", txt);
         if (find(m))
             s.numTurns = to_int(m.group(1));
