@@ -2,7 +2,7 @@ script "Improved Guild Trainer";
 notify rlbond86;
 
 
-boolean debug = false;
+boolean debug = true;
 void debugPrint(string s)
 {
     if (debug)
@@ -48,7 +48,7 @@ SkillInfo getSkillInfo(int number)
     string txt = visit_url("desc_skill.php?whichskill=" + number + "&self=true");
     SkillInfo s;
     s.adventureCost = 0;
-    matcher effectMatcher = create_matcher("<b>Type:</b>\\s*([^<]+)<.*Cost(?:</b>|:)*\\s*(\\d+ [aA]dventure|N/A).*Gives Effect: <b><a.*?href=\"(desc_[^\"]+)\">([^<]+)</a>", txt);
+    matcher effectMatcher = create_matcher("<b>Type:</b>\\s*([^<]+)<.*Cost(?:</b>|:)*\\s*(\\d+ [aA]dventure|\\d+|N/A).*Gives Effect: <b><a.*?href=\"(desc_[^\"]+)\">([^<]+)</a>", txt);
     if (find(effectMatcher))
     {
         debugPrint("Matched skill to an effect");
