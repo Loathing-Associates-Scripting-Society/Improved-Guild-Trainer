@@ -2,7 +2,7 @@ script "Improved Guild Trainer";
 notify rlbond86;
 
 
-boolean debug = true;
+boolean debug = false;
 void debugPrint(string s)
 {
     if (debug)
