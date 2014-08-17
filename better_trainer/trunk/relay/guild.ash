@@ -15,6 +15,7 @@ record SkillInfo
     int numTurns;
     string type;
     string effectText;
+    int adventureCost;
 };
 
 
@@ -46,7 +47,8 @@ SkillInfo getSkillInfo(int number)
 {
     string txt = visit_url("desc_skill.php?whichskill=" + number + "&self=true");
     SkillInfo s;
-    matcher effectMatcher = create_matcher("<b>Type:</b>\\s*([^<]+)<.*MP Cost:</b>\\s*(\\d+|N/A).*Gives Effect: <b><a.*?href=\"(desc_[^\"]+)\">([^<]+)</a>", txt);
+    s.adventureCost = 0;
+    matcher effectMatcher = create_matcher("<b>Type:</b>\\s*([^<]+)<.*Cost(?:</b>|:)*\\s*(\\d+ [aA]dventure|N/A).*Gives Effect: <b><a.*?href=\"(desc_[^\"]+)\">([^<]+)</a>", txt);
     if (find(effectMatcher))
     {
         debugPrint("Matched skill to an effect");
@@ -54,6 +56,13 @@ SkillInfo getSkillInfo(int number)
         string mp = group(effectMatcher, 2);
         if (mp == "N/A")
             s.mpCost = -1;
+        else if (contains_text(mp, "dventure"))
+        {
+            s.mpCost = 0;
+            matcher m = create_matcher("\\d+", mp);
+            find(m);
+            s.adventureCost = to_int(group(m, 0));
+        }
         else
             s.mpCost = to_int(mp);
         s.effectText = getEffect(group(effectMatcher, 3), group(effectMatcher, 4));
@@ -78,7 +87,7 @@ SkillInfo getSkillInfo(int number)
         s.numTurns = -1;
         return s;
     }
-    matcher simpleMatcher = create_matcher("(?s)<b>Type:</b>\\s*([^<]+)<.*MP Cost:</b>\\s*(\\d+|N/A).*<blockquote class=small>([^<]+)<", txt);
+    matcher simpleMatcher = create_matcher("(?s)<b>Type:</b>\\s*([^<]+)<.*(?:MP )?Cost(?:</b>|:)*\\s*(\\d+ [aA]dventure|\\d+|N/A).*<blockquote class=small>([^<]+)<", txt);
     if (find(simpleMatcher))
     {
         debugPrint("Found simple match");
@@ -86,6 +95,13 @@ SkillInfo getSkillInfo(int number)
         string mp = group(simpleMatcher, 2);
         if (mp == "N/A")
             s.mpCost = -1;
+        else if (contains_text(mp, "dventure"))
+        {
+            s.mpCost = 0;
+            matcher m = create_matcher("\\d+", mp);
+            find(m);
+            s.adventureCost = to_int(group(m, 0));
+        }
         else
             s.mpCost = to_int(mp);
         s.effectText = group(simpleMatcher, 3);
@@ -109,7 +125,14 @@ string getSkillText(int number)
 
     SkillInfo s = getSkillInfo(number);
     string st = s.type;
-    if (s.mpCost >= 0)
+    if (s.adventureCost > 0)
+    {
+        if (s.numTurns >= 0)
+            st += " (pay " + s.adventureCost + " adventure(s) for " + s.numTurns + " turns): ";
+        else
+            st += " (pay " + s.adventureCost + " adventure(s)): ";
+    }
+    else if (s.mpCost >= 0)
     {
         if (s.numTurns >= 0)
             st += " (" + s.mpCost + " MP / " + s.numTurns + " adv.): ";
