@@ -3,7 +3,7 @@ notify rlbond86;
 
 
 boolean debug = false;
-void debugPrint(string s)
+void debug_print(string s)
 {
     if (debug)
         print(s);
@@ -51,7 +51,7 @@ SkillInfo getSkillInfo(int number)
     matcher effectMatcher = create_matcher("<b>Type:</b>\\s*([^<]+)<.*Cost(?:</b>|:)*\\s*(\\d+ [aA]dventure|\\d+|N/A).*Gives Effect: <b><a.*?href=\"(desc_[^\"]+)\">([^<]+)</a>", txt);
     if (find(effectMatcher))
     {
-        debugPrint("Matched skill to an effect");
+        debug_print("Matched skill to an effect");
         s.type = group(effectMatcher, 1);
         string mp = group(effectMatcher, 2);
         if (mp == "N/A")
@@ -76,7 +76,7 @@ SkillInfo getSkillInfo(int number)
     matcher blueTextMatcher = create_matcher("(?s)<b>Type:</b>\\s*([^<]+)<.*MP Cost:</b>\\s*(\\d+|N/A).*<font color=blue[^>]*><b>(.*?)</b></font></center>", txt);
     if (find(blueTextMatcher))
     {
-        debugPrint("Found blue text.");
+        debug_print("Found blue text.");
         s.type = group(blueTextMatcher, 1);
         string mp = group(blueTextMatcher, 2);
         if (mp == "N/A")
@@ -90,7 +90,7 @@ SkillInfo getSkillInfo(int number)
     matcher simpleMatcher = create_matcher("(?s)<b>Type:</b>\\s*([^<]+)<.*(?:MP )?Cost(?:</b>|:)*\\s*(\\d+ [aA]dventure|\\d+|N/A).*<blockquote class=small>([^<]+)<", txt);
     if (find(simpleMatcher))
     {
-        debugPrint("Found simple match");
+        debug_print("Found simple match");
         s.type = group(simpleMatcher, 1);
         string mp = group(simpleMatcher, 2);
         if (mp == "N/A")
@@ -108,7 +108,7 @@ SkillInfo getSkillInfo(int number)
         s.numTurns = -2;
         return s;
     }
-    debugPrint("Failed to match.");
+    debug_print("Failed to match.");
     s.type = "?";
     s.mpCost = -1;
     s.numTurns = -1;
@@ -163,7 +163,7 @@ void main()
     matcher m = create_matcher("<b><a onClick='javascript:poop\\(\"desc_skill\\.php\\?whichskill=(\\d+)&self=true\",\"skill\", \\d+, \\d+\\)'>([^<]+)</a></b>&nbsp;&nbsp;&nbsp;", txt);
     while (find(m))
     {
-        debugPrint("Found skill " + group(m, 2));
+        debug_print("Found skill " + group(m, 2));
         string skillNumber = group(m, 1);
         string skillName = group(m, 2);
         string st = getSkillText(to_int(skillNumber));
