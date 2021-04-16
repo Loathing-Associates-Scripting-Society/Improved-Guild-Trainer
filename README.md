@@ -14,7 +14,7 @@ svn delete rlbond86-mafia-scripts-better_trainer-trunk
 ### Installation
 
 ```
-svn checkout https://github.com/Loathing-Associates-Scripting-Society/better_trainer/trunk/RELEASE/
+svn checkout https://github.com/Loathing-Associates-Scripting-Society/Improved-Guild-Trainer/trunk/RELEASE/
 ```
 
 ## Usage & Configuration
