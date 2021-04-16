@@ -1,4 +1,4 @@
-# better_trainer
+# Improved Guild Trainer
 
 Better Trainer is a KoL mafia relay script that improves the guild trainer by adding an inline description of what each skill does.
 
