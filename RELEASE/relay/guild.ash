@@ -120,7 +120,7 @@ SkillInfo getSkillInfo(int number)
 string getSkillText(int number)
 {
     static string[int] skillMap;
-    file_to_map("skillmap.txt", skillMap);
+    file_to_map("guild_trainer.txt", skillMap);
     if (skillMap contains number)
         return skillMap[number];
 
@@ -149,7 +149,7 @@ string getSkillText(int number)
     if (s.numTurns == -2)
         st = "<font size=1><span style=\"max-width:300px; width:300px;\">" + st + "</span></font>";
     skillMap[number] = st;
-    map_to_file(skillMap, "skillmap.txt");
+    map_to_file(skillMap, "guild_trainer.txt");
     return st;
 }
 
